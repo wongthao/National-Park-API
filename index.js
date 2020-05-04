@@ -1,4 +1,12 @@
 
+function formatQueryParams(params){
+    const queryItems = Object.keys(params).map(key => `${[encodeURIComponent(key)]}=${encodeURIComponent(params[key])}`);
+    return queryItems.join('&');
+
+}
+
+
+
 function displayResults(responseJson,searchNum){
     console.log(responseJson);
     $('#result-list').empty();
@@ -16,12 +24,17 @@ function displayResults(responseJson,searchNum){
 }
 
 
+function getPark(baseUrl,searchTerm,searchNum,apiKey){
 
+    const params ={
+        stateCode: searchTerm,
+        limit: searchNum
+    }
 
-function getPark(searchTerm,searchNum){
-    let parkUrl = `https://developer.nps.gov/api/v1/parks?stateCode=${searchTerm}&limit=${searchNum}&API_KEY=aBZbhtdhn97CEObCBWlJVvbavQsQlbY7xYcPFVcr`;
+    const queryString = formatQueryParams(params);
+    const url = baseUrl + '?' + queryString + '&api_key=' + apiKey;
 
-    fetch(parkUrl)
+    fetch(url)
     .then(response => {if(response.ok){
         return response.json();
     } throw new Error(response.statusText);
@@ -36,9 +49,11 @@ function getPark(searchTerm,searchNum){
 function submit(){
     $('form').submit( event => {
         event.preventDefault();
-        let searchTerm = $('#js-parks').val();
-        let searchNum = $('#quantity').val();
-        getPark(searchTerm,searchNum);
+        const baseUrl = 'https://developer.nps.gov/api/v1/parks'
+        const searchTerm = $('#js-parks').val().split(",");
+        const searchNum = $('#quantity').val();
+        const apiKey = 'aBZbhtdhn97CEObCBWlJVvbavQsQlbY7xYcPFVcr'
+        getPark(baseUrl,searchTerm,searchNum,apiKey);
     });
 }
 
